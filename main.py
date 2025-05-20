@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import asyncpg
 import asyncio
 from routes.pessoa_routes import router as pessoa_router
+from routes.carro_routes import router as carro_router
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ async def shutdown():
     await app.state.pool.close()
 
 app.include_router(pessoa_router)
+app.include_router(carro_router)
 
 @app.get("/")
 async def root():

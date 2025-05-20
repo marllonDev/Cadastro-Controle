@@ -15,6 +15,7 @@ class PessoaController:
                 pessoas.append(Pessoa(id=row['id'], nome=row['nome'], idade=row['idade'], email=row['email'], criado_em=criado_em))
             return pessoas
 
+
     async def obter_pessoa(self, pessoa_id: int) -> Optional[Pessoa]:
         async with self.pool.acquire() as conn:
             row = await conn.fetchrow('SELECT id, nome, idade, email, criado_em FROM pessoas WHERE id = $1', pessoa_id)
@@ -22,6 +23,7 @@ class PessoaController:
                 criado_em = row['criado_em'].date() if row['criado_em'] else None
                 return Pessoa(id=row['id'], nome=row['nome'], idade=row['idade'], email=row['email'], criado_em=criado_em)
             return None
+
 
     async def criar_pessoa(self, pessoa: Pessoa) -> Pessoa:
         async with self.pool.acquire() as conn:
@@ -32,6 +34,7 @@ class PessoaController:
             pessoa.id = row['id']
             pessoa.criado_em = row['criado_em'].date() if row['criado_em'] else None
             return pessoa
+
 
     async def atualizar_pessoa(self, pessoa_id: int, pessoa: Pessoa) -> Optional[Pessoa]:
         async with self.pool.acquire() as conn:
@@ -44,6 +47,7 @@ class PessoaController:
                 pessoa.criado_em = (await conn.fetchrow('SELECT criado_em FROM pessoas WHERE id = $1', pessoa_id))['criado_em'].date()
                 return pessoa
             return None
+
 
     async def deletar_pessoa(self, pessoa_id: int) -> bool:
         async with self.pool.acquire() as conn:
