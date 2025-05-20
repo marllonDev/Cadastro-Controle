@@ -11,10 +11,14 @@ class CarroController:
             rows = await conn.fetch('SELECT id, nome, ano, marca, preco FROM carros')
             return [Carro(id=row['id'], nome=row['nome'], ano=row['ano'], marca=row['marca'], preco=row['preco']) for row in rows]
     
+
     async def obter_carro(self, carro_id: int) -> Optional[Carro]:
         async with self.pool.acquire() as conn:
-            row = await conn.fetchrow('SELECT id, nome, ano, marca, preco FROM carros WHERE id = $1', carro_id)
-            return [Carro(id=row['id'], nome=row['nome'], ano=row['ano'], marca=row['marca'], preco=row['preco']) for row in rows]
+            row = await conn.fetchrow(f'SELECT id, nome, ano, marca, preco FROM carros WHERE id = {carro_id}')
+            if row:
+                return Carro(id=row['id'], nome=row['nome'], ano=row['ano'], marca=row['marca'], preco=row['preco'])
+            return None
+
 
     async def criar_carro(self, carro: Carro) -> Carro:
         async with self.pool.acquire() as conn:
@@ -22,7 +26,9 @@ class CarroController:
                 'INSERT INTO carros (nome, ano, marca, preco) VALUES($1, $2, $3, $4) RETURNING id', carro.nome, carro.ano, carro.marca, carro.preco
                 )
             carro_id = row['id']
-            return Carro
+            carro.id = carro_id
+            return carro
+
 
     async def atualizar_carro(self, carro_id: int, carro: Carro) -> Optional[Carro]:
         async with self.pool.acquire() as conn:
@@ -30,9 +36,10 @@ class CarroController:
                 'UPDATE carros SET nome = $1, ano = $2, marca = $3, preco = $4 WHERE id = $5', carro.nome, carro.ano, carro.marca, carro.preco, carro_id
             )
             if result.startswith('UPDATE 1'):
-                carro_id = carro_id
+                carro.id = carro_id
                 return carro
             return None
+
 
     async def deletar_carro(self, carro_id: int) -> bool:
         async with self.pool.acquire() as conn:
