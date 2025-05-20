@@ -1,3 +1,4 @@
+from datetime import date
 from pydantic import BaseModel
 
 class Pessoa(BaseModel):
@@ -5,3 +6,4 @@ class Pessoa(BaseModel):
     nome: str
     idade: int
     email: str
+    criado_em: date | None = None
