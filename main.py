@@ -3,8 +3,16 @@ import asyncpg
 import asyncio
 from routes.pessoa_routes import router as pessoa_router
 from routes.carro_routes import router as carro_router
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 DATABASE_URL = "postgresql://adm:adm@localhost:5432/postgres"
 
